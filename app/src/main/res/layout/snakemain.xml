@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/snakeBGGreen">
+
+     <androidx.constraintlayout.widget.ConstraintLayout
+         android:id="@+id/constraintLayout2"
+         android:layout_width="match_parent"
+         android:layout_height="200dp"
+         android:background="@drawable/snakeportada"
+         app:layout_constraintEnd_toEndOf="parent"
+         app:layout_constraintStart_toStartOf="parent"
+         app:layout_constraintTop_toTopOf="parent">
+
+     </androidx.constraintlayout.widget.ConstraintLayout>
+
+     <com.example.exergames_beta.games.Snake.SnakeView
+         android:id="@+id/snakeView"
+         android:layout_width="match_parent"
+         android:layout_height="500dp"
+         app:layout_constraintEnd_toEndOf="parent"
+         app:layout_constraintStart_toStartOf="parent"
+         app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
+
+     <TextView
+         android:id="@+id/pointsTV"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="10dp"
+         android:padding="10dp"
+         android:text="Puntos: 559"
+         android:textAlignment="center"
+         android:textColor="@color/white"
+         android:textSize="20dp"
+         android:textStyle="bold"
+         app:layout_constraintEnd_toEndOf="parent"
+         app:layout_constraintStart_toStartOf="parent"
+         app:layout_constraintTop_toBottomOf="@+id/snakeView" />
+
+     <TextView
+         android:id="@+id/movementTV"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="5dp"
+         android:text="Movimiento: izquierda"
+         android:textStyle="bold"
+         android:textSize="16dp"
+         android:textColor="@color/white"
+         android:textAlignment="center"
+         app:layout_constraintEnd_toEndOf="parent"
+         app:layout_constraintStart_toStartOf="parent"
+         app:layout_constraintTop_toBottomOf="@+id/pointsTV" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
