@@ -289,7 +289,7 @@ public class FaceDetectionAnalyzer extends AppCompatActivity implements ImageAna
             InputImage inputImage = InputImage.fromMediaImage(mediaImage, image.getImageInfo().getRotationDegrees());
             faceDetector.process(inputImage)
                     .addOnSuccessListener(faces -> {
-
+                        runOnUiThread(() -> {
                             // Comprobar si hay alguna cara detectada en la lista de caras
                             if (!faces.isEmpty()) {
                                 // Solo interesa la primera cara encontrada
@@ -323,45 +323,47 @@ public class FaceDetectionAnalyzer extends AppCompatActivity implements ImageAna
                                         listener.onFaceMovement(hMovement, vMovement);
                                     }
 
-                                    runOnUiThread(() -> {
-                                        String text = "";
-                                        if (!(viewFinder==null)) {
-                                            // PINTAR GRAPHIC OVERLAY
-                                            graphicOverlay.updateCoordinates(coordenadaActual.getX(), coordenadaActual.getY());
+                                    String text = "";
+                                    if (!(viewFinder==null)) {
+                                        // PINTAR GRAPHIC OVERLAY
+                                        graphicOverlay.updateCoordinates(coordenadaActual.getX(), coordenadaActual.getY());
 
-                                            // PRINT DEL MOVIMIENTO DETECTADO
-                                            // Coordenadas
-                                            text = "Coordenadas: ("+coordenadaActual.getX()+","+coordenadaActual.getY()+")";
-                                            coordenadasTextView.setText(text);
-                                            // Desplazamiento (actualPosition - previousPosition)
-                                            text = "Desplazamiento en X e Y: ("+despX+","+despY+")";
-                                            desplazamientoTextView.setText(text);
-                                            // Movimientos detectados (arriba, abajo, izq, dch)
-                                            text = "Movimiento detectado: ";
-                                            if (hMovement.isEmpty() && vMovement.isEmpty()) {
-                                                text += "Ninguno";
-                                            }
-                                            if (!hMovement.isEmpty()) {
-                                                text += hMovement;
-                                            }
-                                            if (!vMovement.isEmpty()) {
-                                                if(hMovement.isEmpty()) {
-                                                    text += vMovement;
-                                                } else {
-                                                    text += " y "+vMovement;
-                                                }
-                                            }
-                                            movimientoTextView.setText(text);
-                                            // Desplazamiento (formula distancia euclidiana)
-                                            text = "Desplazamiento absoluto: "+absoluteDistance;
-                                            desplazamientoAbsTextView.setText(text);
-                                            // Datos del programa para conocer el estado de la ejecucion
-                                            text="Análisis realizados: "+numCalls+
-                                                    ", Distancia entre coordenadas: "+absoluteDistance+
-                                                    "\nCoordenada anterior: "+coordenadaAnterior.toString();
-                                            infoTextView.setText(text);
+                                        // PRINT DEL MOVIMIENTO DETECTADO
+                                        // Coordenadas
+                                        text = "Coordenadas: ("+coordenadaActual.getX()+","+coordenadaActual.getY()+")";
+                                        coordenadasTextView.setText(text);
+                                        // Desplazamiento (actualPosition - previousPosition)
+                                        text = "Desplazamiento en X e Y: ("+despX+","+despY+")";
+                                        desplazamientoTextView.setText(text);
+                                        // Movimientos detectados (arriba, abajo, izq, dch)
+                                        text = "Movimiento detectado: ";
+                                        if (hMovement.isEmpty() && vMovement.isEmpty()) {
+                                            text += "Ninguno";
                                         }
-                                    });
+                                        if (!hMovement.isEmpty()) {
+                                            text += hMovement;
+                                        }
+                                        if (!vMovement.isEmpty()) {
+                                            if(hMovement.isEmpty()) {
+                                                text += vMovement;
+                                            } else {
+                                                text += " y "+vMovement;
+                                            }
+                                        }
+                                        movimientoTextView.setText(text);
+                                        // Desplazamiento (formula distancia euclidiana)
+                                        text = "Desplazamiento absoluto: "+absoluteDistance;
+                                        desplazamientoAbsTextView.setText(text);
+                                        // Datos del programa para conocer el estado de la ejecucion
+                                        text="Análisis realizados: "+numCalls+
+                                                ", Distancia entre coordenadas: "+absoluteDistance+
+                                                "\nCoordenada anterior: "+coordenadaAnterior.toString();
+                                        infoTextView.setText(text);
+                                    }
+
+
+                                    // Mensaje en el Logcat para debugging
+                                    Log.i("INFO COORDENADAS", text);
 
                                     // PARA EL PROXIMO ANALISIS
                                     coordenadaAnterior = coordenadaActual;
@@ -385,7 +387,7 @@ public class FaceDetectionAnalyzer extends AppCompatActivity implements ImageAna
                                     infoTextView.setText("");
                                 }
                             }
-
+                        });
                     })
                     .addOnFailureListener(faces -> {
                         runOnUiThread(() -> {
