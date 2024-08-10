@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black_UIB">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="blue_UIB">#0065BD</color>
+    <color name="blue_UIB_2">#2e3192</color>
+    <color name="blue_UIB_3">#00204a</color>
+    <color name="blue_UIB_4">#00bbf0</color>
+    <color name="blue_UIB_5">#2c78ec</color>
+    <color name="red_EXERGAMES">#ec2b0c</color>
+    <color name="orange_EXERGAMES">#ff520d</color>
+    <color name="snake">#572364</color>
+    <color name="snakeBGGreen">#015d52</color>
+    <color name="greenFollowers">#2EAE2E</color>
+    <color name="blueFollowed">#00BCD4</color>
+
+</resources>
