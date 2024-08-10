@@ -155,6 +155,131 @@ public class FaceDetectionAnalyzer extends AppCompatActivity implements ImageAna
         }, ContextCompat.getMainExecutor(context));
     }
 
+//    @Override
+//    @OptIn(markerClass = ExperimentalGetImage.class)
+//    public void analyze(@NonNull ImageProxy image) {
+//        numCalls++;
+//        Image mediaImage = image.getImage();
+//        if (mediaImage != null) {
+//            InputImage inputImage = InputImage.fromMediaImage(mediaImage, image.getImageInfo().getRotationDegrees());
+//            faceDetector.process(inputImage)
+//                    .addOnSuccessListener(faces -> {
+//                        runOnUiThread(() -> {
+//                            // Comprobar si hay alguna cara detectada en la lista de caras
+//                            if (!faces.isEmpty()) {
+//                                // Solo interesa la primera cara encontrada
+//                                Face face = faces.get(0);
+//                                FaceLandmark noseBase = face.getLandmark(FaceLandmark.NOSE_BASE);
+//                                if (noseBase != null) {
+//                                    // OBTENER COORDENADAS
+//                                    PointF noseBasePosition = noseBase.getPosition();
+//                                    coordenadaActual = new Coordenada();
+//                                    coordenadaActual.setX(noseBasePosition.x);
+//                                    coordenadaActual.setY(noseBasePosition.y);
+//
+//                                    // OBTENER DESPLAZAMIENTOS Y DISTANCIAS
+//                                    if (primeraVez) {
+//                                        primeraVez = false;
+//                                        despX = 0;
+//                                        despY = 0;
+//                                        absoluteDistance = 0;
+//                                    } else {
+//                                        despX = coordenadaActual.getX() - coordenadaAnterior.getX();
+//                                        despY = coordenadaActual.getY() - coordenadaAnterior.getY();
+//                                        absoluteDistance = coordenadaActual.getAbsoluteDistance(coordenadaAnterior);
+//                                    }
+//
+//                                    // DETECTAR MOVIMIENTOS EN BASE A VARIACIONES DE COORDENADAS
+//                                    hMovement = this.getHorizontalFaceMovement(despX);
+//                                    vMovement = this.getVerticalFaceMovement(despY);
+//
+//                                    // LISTENER QUE LLAMA A LA ACCIÓN EN JUEGOS
+//                                    if (listener != null) {
+//                                        listener.onFaceMovement(hMovement, vMovement);
+//                                    }
+//
+//                                    String text = "";
+//                                    if (!(viewFinder==null)) {
+//                                        // PINTAR GRAPHIC OVERLAY
+//                                        graphicOverlay.updateCoordinates(coordenadaActual.getX(), coordenadaActual.getY());
+//
+//                                        // PRINT DEL MOVIMIENTO DETECTADO
+//                                        // Coordenadas
+//                                        text = "Coordenadas: ("+coordenadaActual.getX()+","+coordenadaActual.getY()+")";
+//                                        coordenadasTextView.setText(text);
+//                                        // Desplazamiento (actualPosition - previousPosition)
+//                                        text = "Desplazamiento en X e Y: ("+despX+","+despY+")";
+//                                        desplazamientoTextView.setText(text);
+//                                        // Movimientos detectados (arriba, abajo, izq, dch)
+//                                        text = "Movimiento detectado: ";
+//                                        if (hMovement.isEmpty() && vMovement.isEmpty()) {
+//                                            text += "Ninguno";
+//                                        }
+//                                        if (!hMovement.isEmpty()) {
+//                                            text += hMovement;
+//                                        }
+//                                        if (!vMovement.isEmpty()) {
+//                                            if(hMovement.isEmpty()) {
+//                                                text += vMovement;
+//                                            } else {
+//                                                text += " y "+vMovement;
+//                                            }
+//                                        }
+//                                        movimientoTextView.setText(text);
+//                                        // Desplazamiento (formula distancia euclidiana)
+//                                        text = "Desplazamiento absoluto: "+absoluteDistance;
+//                                        desplazamientoAbsTextView.setText(text);
+//                                        // Datos del programa para conocer el estado de la ejecucion
+//                                        text="Análisis realizados: "+numCalls+
+//                                                ", Distancia entre coordenadas: "+absoluteDistance+
+//                                                "\nCoordenada anterior: "+coordenadaAnterior.toString();
+//                                        infoTextView.setText(text);
+//                                    }
+//
+//
+//                                    // Mensaje en el Logcat para debugging
+//                                    Log.i("INFO COORDENADAS", text);
+//
+//                                    // PARA EL PROXIMO ANALISIS
+//                                    coordenadaAnterior = coordenadaActual;
+//                                    vMovement = "Ninguno";
+//                                    hMovement = "Ninguno";
+//                                } else {
+//                                    if (!(viewFinder==null)) {
+//                                        coordenadasTextView.setText("No se ha podido encontrar una nariz en el rostro");
+//                                        desplazamientoTextView.setText("No se ha podido encontrar un desplazamiento");
+//                                        movimientoTextView.setText("No se ha podido detectar un movimiento");
+//                                        Log.i("INFO COORDENADAS", "Cara detectada pero nariz no detectada");
+//                                    }
+//                                }
+//                            } else {
+//                                Log.i("INFO COORDENADAS", "NO SE HAN DETECTADO CARAS");
+//                                if (!(viewFinder==null)) {
+//                                    coordenadasTextView.setText("No se han detectado caras");
+//                                    desplazamientoTextView.setText("");
+//                                    movimientoTextView.setText("");
+//                                    desplazamientoAbsTextView.setText("");
+//                                    infoTextView.setText("");
+//                                }
+//                            }
+//                        });
+//                    })
+//                    .addOnFailureListener(faces -> {
+//                        runOnUiThread(() -> {
+//                            Log.i("INFO COORDENADAS", "NO SE HA PODIDO DETECTAR COORDENADAS EN UNA CARA O HA HABIDO UN ERROR");
+//                            if (!(viewFinder==null)) {
+//                                coordenadasTextView.setText("Error al detectar rostros");
+//                                desplazamientoTextView.setText("");
+//                                movimientoTextView.setText("");
+//                                desplazamientoAbsTextView.setText("");
+//                                infoTextView.setText("");
+//                            }
+//                        });
+//                    })
+//                    .addOnCompleteListener(task -> image.close());
+//        }
+//    }
+
     @Override
     @OptIn(markerClass = ExperimentalGetImage.class)
     public void analyze(@NonNull ImageProxy image) {
@@ -164,7 +289,7 @@ public class FaceDetectionAnalyzer extends AppCompatActivity implements ImageAna
             InputImage inputImage = InputImage.fromMediaImage(mediaImage, image.getImageInfo().getRotationDegrees());
             faceDetector.process(inputImage)
                     .addOnSuccessListener(faces -> {
-                        runOnUiThread(() -> {
+
                             // Comprobar si hay alguna cara detectada en la lista de caras
                             if (!faces.isEmpty()) {
                                 // Solo interesa la primera cara encontrada
@@ -198,47 +323,45 @@ public class FaceDetectionAnalyzer extends AppCompatActivity implements ImageAna
                                         listener.onFaceMovement(hMovement, vMovement);
                                     }
 
-                                    String text = "";
-                                    if (!(viewFinder==null)) {
-                                        // PINTAR GRAPHIC OVERLAY
-                                        graphicOverlay.updateCoordinates(coordenadaActual.getX(), coordenadaActual.getY());
+                                    runOnUiThread(() -> {
+                                        String text = "";
+                                        if (!(viewFinder==null)) {
+                                            // PINTAR GRAPHIC OVERLAY
+                                            graphicOverlay.updateCoordinates(coordenadaActual.getX(), coordenadaActual.getY());
 
-                                        // PRINT DEL MOVIMIENTO DETECTADO
-                                        // Coordenadas
-                                        text = "Coordenadas: ("+coordenadaActual.getX()+","+coordenadaActual.getY()+")";
-                                        coordenadasTextView.setText(text);
-                                        // Desplazamiento (actualPosition - previousPosition)
-                                        text = "Desplazamiento en X e Y: ("+despX+","+despY+")";
-                                        desplazamientoTextView.setText(text);
-                                        // Movimientos detectados (arriba, abajo, izq, dch)
-                                        text = "Movimiento detectado: ";
-                                        if (hMovement.isEmpty() && vMovement.isEmpty()) {
-                                            text += "Ninguno";
-                                        }
-                                        if (!hMovement.isEmpty()) {
-                                            text += hMovement;
-                                        }
-                                        if (!vMovement.isEmpty()) {
-                                            if(hMovement.isEmpty()) {
-                                                text += vMovement;
-                                            } else {
-                                                text += " y "+vMovement;
+                                            // PRINT DEL MOVIMIENTO DETECTADO
+                                            // Coordenadas
+                                            text = "Coordenadas: ("+coordenadaActual.getX()+","+coordenadaActual.getY()+")";
+                                            coordenadasTextView.setText(text);
+                                            // Desplazamiento (actualPosition - previousPosition)
+                                            text = "Desplazamiento en X e Y: ("+despX+","+despY+")";
+                                            desplazamientoTextView.setText(text);
+                                            // Movimientos detectados (arriba, abajo, izq, dch)
+                                            text = "Movimiento detectado: ";
+                                            if (hMovement.isEmpty() && vMovement.isEmpty()) {
+                                                text += "Ninguno";
                                             }
+                                            if (!hMovement.isEmpty()) {
+                                                text += hMovement;
+                                            }
+                                            if (!vMovement.isEmpty()) {
+                                                if(hMovement.isEmpty()) {
+                                                    text += vMovement;
+                                                } else {
+                                                    text += " y "+vMovement;
+                                                }
+                                            }
+                                            movimientoTextView.setText(text);
+                                            // Desplazamiento (formula distancia euclidiana)
+                                            text = "Desplazamiento absoluto: "+absoluteDistance;
+                                            desplazamientoAbsTextView.setText(text);
+                                            // Datos del programa para conocer el estado de la ejecucion
+                                            text="Análisis realizados: "+numCalls+
+                                                    ", Distancia entre coordenadas: "+absoluteDistance+
+                                                    "\nCoordenada anterior: "+coordenadaAnterior.toString();
+                                            infoTextView.setText(text);
                                         }
-                                        movimientoTextView.setText(text);
-                                        // Desplazamiento (formula distancia euclidiana)
-                                        text = "Desplazamiento absoluto: "+absoluteDistance;
-                                        desplazamientoAbsTextView.setText(text);
-                                        // Datos del programa para conocer el estado de la ejecucion
-                                        text="Análisis realizados: "+numCalls+
-                                                ", Distancia entre coordenadas: "+absoluteDistance+
-                                                "\nCoordenada anterior: "+coordenadaAnterior.toString();
-                                        infoTextView.setText(text);
-                                    }
-
-
-                                    // Mensaje en el Logcat para debugging
-                                    Log.i("INFO COORDENADAS", text);
+                                    });
 
                                     // PARA EL PROXIMO ANALISIS
                                     coordenadaAnterior = coordenadaActual;
@@ -262,7 +385,7 @@ public class FaceDetectionAnalyzer extends AppCompatActivity implements ImageAna
                                     infoTextView.setText("");
                                 }
                             }
-                        });
+
                     })
                     .addOnFailureListener(faces -> {
                         runOnUiThread(() -> {
