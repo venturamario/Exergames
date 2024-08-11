@@ -42,19 +42,22 @@ public class GameDetail extends AppCompatActivity {
         Intent intent = getIntent();
         superObject = (SuperObject) intent.getSerializableExtra("superObject");
 
-        // Obtener exergame, usuario del super objeto
-        user = superObject.getUser();
-        exergame = superObject.getGame();
+        if (superObject != null) {
+            user = superObject.getUser();
+            exergame = superObject.getGame();
 
-        // Cargar imagen del juego
-        loadExergameImage(exergame);
+            // Cargar imagen del juego
+            loadExergameImage(exergame);
 
-        exName.setText(exergame.getName());
-        exDescription.setText(exergame.getDescription());
-        String text = exergame.getDifficulty() + " Estrellas";
-        exDifficulty.setText(text);
-        String cervConditions = exergame.getCervicalConditionsString();
-        exProbCerv.setText(cervConditions);
+            exName.setText(exergame.getName());
+            exDescription.setText(exergame.getDescription());
+            String text = exergame.getDifficulty() + " Estrellas";
+            exDifficulty.setText(text);
+            String cervConditions = exergame.getCervicalConditionsString();
+            exProbCerv.setText(cervConditions);
+        } else {
+            finish();
+        }
     }
 
     // Jugar al juego seleccionado
