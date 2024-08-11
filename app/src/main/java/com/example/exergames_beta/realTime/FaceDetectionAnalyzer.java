@@ -1,6 +1,7 @@
 package com.example.exergames_beta.realTime;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.media.Image;
 import android.os.Bundle;
@@ -34,6 +35,9 @@ import com.google.mlkit.vision.face.FaceLandmark;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import java.nio.ByteBuffer;
+import android.graphics.BitmapFactory;
 
 public class FaceDetectionAnalyzer extends AppCompatActivity implements ImageAnalysis.Analyzer {
 
@@ -286,10 +290,12 @@ public class FaceDetectionAnalyzer extends AppCompatActivity implements ImageAna
         numCalls++;
         Image mediaImage = image.getImage();
         if (mediaImage != null) {
-            InputImage inputImage = InputImage.fromMediaImage(mediaImage, image.getImageInfo().getRotationDegrees());
+            Bitmap bitmap = convertImageProxyToBitmap(image);
+            Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth() / 2, bitmap.getHeight() / 2, true);
+            InputImage inputImage = InputImage.fromBitmap(scaledBitmap, image.getImageInfo().getRotationDegrees());
+
             faceDetector.process(inputImage)
                     .addOnSuccessListener(faces -> {
-
                             // Comprobar si hay alguna cara detectada en la lista de caras
                             if (!faces.isEmpty()) {
                                 // Solo interesa la primera cara encontrada
@@ -387,6 +393,7 @@ public class FaceDetectionAnalyzer extends AppCompatActivity implements ImageAna
                             }
 
                     })
+
                     .addOnFailureListener(faces -> {
                         runOnUiThread(() -> {
                             Log.i("INFO COORDENADAS", "NO SE HA PODIDO DETECTAR COORDENADAS EN UNA CARA O HA HABIDO UN ERROR");
@@ -399,9 +406,19 @@ public class FaceDetectionAnalyzer extends AppCompatActivity implements ImageAna
                             }
                         });
                     })
+
                     .addOnCompleteListener(task -> image.close());
         }
     }
+
+    private Bitmap convertImageProxyToBitmap(ImageProxy image) {
+        ImageProxy.PlaneProxy[] planes = image.getPlanes();
+        ByteBuffer buffer = planes[0].getBuffer();
+        byte[] bytes = new byte[buffer.capacity()];
+        buffer.get(bytes);
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
+    }
+
 
     @Override
     protected void onDestroy() {
