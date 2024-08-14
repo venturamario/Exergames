@@ -2,15 +2,25 @@ package com.example.exergames_beta.realTime;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.ImageFormat;
+import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.PointF;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.YuvImage;
 import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.camera.core.AspectRatio;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ExperimentalGetImage;
 import androidx.camera.core.ImageAnalysis;
@@ -21,7 +31,6 @@ import androidx.camera.view.PreviewView;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
 
-import com.example.exergames_beta.games.Snake.SnakeMain;
 import com.example.exergames_beta.util.Coordenada;
 import com.example.exergames_beta.R;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -32,12 +41,11 @@ import com.google.mlkit.vision.face.FaceDetector;
 import com.google.mlkit.vision.face.FaceDetectorOptions;
 import com.google.mlkit.vision.face.FaceLandmark;
 
+import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import java.nio.ByteBuffer;
-import android.graphics.BitmapFactory;
 
 public class FaceDetectionAnalyzer extends AppCompatActivity implements ImageAnalysis.Analyzer {
 
@@ -127,19 +135,21 @@ public class FaceDetectionAnalyzer extends AppCompatActivity implements ImageAna
 
                 // Configuración de la vista previa
                 if (!(viewFinder==null)) {
-                    preview = new Preview.Builder().build();
+                    preview = new Preview.Builder()
+                            .setTargetAspectRatio(AspectRatio.RATIO_4_3)
+                            .build();
                     preview.setSurfaceProvider(viewFinder.getSurfaceProvider());
                 }
 
                 // Configuración del análisis de imagen
                 ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
-                                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                                .build();
+                        .setTargetAspectRatio(AspectRatio.RATIO_4_3)
+                        .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                        .build();
 
                 imageAnalysis.setAnalyzer(executor, this);
-                //imageAnalysis.setAnalyzer(executor, new FaceDetectionAnalyzer());
 
-                // Selector de cámara (debe ser camara de selfie !!!)
+                // Selector de camara frontal
                 CameraSelector cameraSelector = new CameraSelector.Builder()
                         .requireLensFacing(CameraSelector.LENS_FACING_FRONT)
                         .build();
@@ -289,13 +299,13 @@ public class FaceDetectionAnalyzer extends AppCompatActivity implements ImageAna
     public void analyze(@NonNull ImageProxy image) {
         numCalls++;
         Image mediaImage = image.getImage();
+
         if (mediaImage != null) {
-            Bitmap bitmap = convertImageProxyToBitmap(image);
-            Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth() / 2, bitmap.getHeight() / 2, true);
-            InputImage inputImage = InputImage.fromBitmap(scaledBitmap, image.getImageInfo().getRotationDegrees());
+            InputImage inputImage = InputImage.fromMediaImage(mediaImage, image.getImageInfo().getRotationDegrees());
 
             faceDetector.process(inputImage)
                     .addOnSuccessListener(faces -> {
+                        runOnUiThread(() -> {
                             // Comprobar si hay alguna cara detectada en la lista de caras
                             if (!faces.isEmpty()) {
                                 // Solo interesa la primera cara encontrada
@@ -304,9 +314,21 @@ public class FaceDetectionAnalyzer extends AppCompatActivity implements ImageAna
                                 if (noseBase != null) {
                                     // OBTENER COORDENADAS
                                     PointF noseBasePosition = noseBase.getPosition();
+
+                                    // Ajustar coordenadas para mirroring horizontal
+                                    float adjustedX;
+                                    if (viewFinder != null) {
+                                        // Invertir para solucionar mirroring en vista de "Proabr Tracker"
+                                        adjustedX = viewFinder.getWidth() - noseBasePosition.x;
+                                    } else {
+                                        // Uso de coordenada sin invertir para jugar a juegos
+                                        adjustedX = noseBasePosition.x;
+                                    }
+                                    float adjustedY = noseBasePosition.y;
+
                                     coordenadaActual = new Coordenada();
-                                    coordenadaActual.setX(noseBasePosition.x);
-                                    coordenadaActual.setY(noseBasePosition.y);
+                                    coordenadaActual.setX(adjustedX);
+                                    coordenadaActual.setY(adjustedY);
 
                                     // OBTENER DESPLAZAMIENTOS Y DISTANCIAS
                                     if (primeraVez) {
@@ -329,45 +351,47 @@ public class FaceDetectionAnalyzer extends AppCompatActivity implements ImageAna
                                         listener.onFaceMovement(hMovement, vMovement);
                                     }
 
-                                    runOnUiThread(() -> {
-                                        String text = "";
-                                        if (!(viewFinder==null)) {
-                                            // PINTAR GRAPHIC OVERLAY
-                                            graphicOverlay.updateCoordinates(coordenadaActual.getX(), coordenadaActual.getY());
+                                    String text = "";
+                                    if (!(viewFinder==null)) {
+                                        // PINTAR GRAPHIC OVERLAY
+                                        graphicOverlay.updateCoordinates(coordenadaActual.getX(), coordenadaActual.getY());
 
-                                            // PRINT DEL MOVIMIENTO DETECTADO
-                                            // Coordenadas
-                                            text = "Coordenadas: ("+coordenadaActual.getX()+","+coordenadaActual.getY()+")";
-                                            coordenadasTextView.setText(text);
-                                            // Desplazamiento (actualPosition - previousPosition)
-                                            text = "Desplazamiento en X e Y: ("+despX+","+despY+")";
-                                            desplazamientoTextView.setText(text);
-                                            // Movimientos detectados (arriba, abajo, izq, dch)
-                                            text = "Movimiento detectado: ";
-                                            if (hMovement.isEmpty() && vMovement.isEmpty()) {
-                                                text += "Ninguno";
-                                            }
-                                            if (!hMovement.isEmpty()) {
-                                                text += hMovement;
-                                            }
-                                            if (!vMovement.isEmpty()) {
-                                                if(hMovement.isEmpty()) {
-                                                    text += vMovement;
-                                                } else {
-                                                    text += " y "+vMovement;
-                                                }
-                                            }
-                                            movimientoTextView.setText(text);
-                                            // Desplazamiento (formula distancia euclidiana)
-                                            text = "Desplazamiento absoluto: "+absoluteDistance;
-                                            desplazamientoAbsTextView.setText(text);
-                                            // Datos del programa para conocer el estado de la ejecucion
-                                            text="Análisis realizados: "+numCalls+
-                                                    ", Distancia entre coordenadas: "+absoluteDistance+
-                                                    "\nCoordenada anterior: "+coordenadaAnterior.toString();
-                                            infoTextView.setText(text);
+                                        // PRINT DEL MOVIMIENTO DETECTADO
+                                        // Coordenadas
+                                        text = "Coordenadas: ("+coordenadaActual.getX()+","+coordenadaActual.getY()+")";
+                                        coordenadasTextView.setText(text);
+                                        // Desplazamiento (actualPosition - previousPosition)
+                                        text = "Desplazamiento en X e Y: ("+despX+","+despY+")";
+                                        desplazamientoTextView.setText(text);
+                                        // Movimientos detectados (arriba, abajo, izq, dch)
+                                        text = "Movimiento detectado: ";
+                                        if (hMovement.isEmpty() && vMovement.isEmpty()) {
+                                            text += "Ninguno";
                                         }
-                                    });
+                                        if (!hMovement.isEmpty()) {
+                                            text += hMovement;
+                                        }
+                                        if (!vMovement.isEmpty()) {
+                                            if(hMovement.isEmpty()) {
+                                                text += vMovement;
+                                            } else {
+                                                text += " y "+vMovement;
+                                            }
+                                        }
+                                        movimientoTextView.setText(text);
+                                        // Desplazamiento (formula distancia euclidiana)
+                                        text = "Desplazamiento absoluto: "+absoluteDistance;
+                                        desplazamientoAbsTextView.setText(text);
+                                        // Datos del programa para conocer el estado de la ejecucion
+                                        text="Análisis realizados: "+numCalls+
+                                                ", Distancia entre coordenadas: "+absoluteDistance+
+                                                "\nCoordenada anterior: "+coordenadaAnterior.toString();
+                                        infoTextView.setText(text);
+                                    }
+
+
+                                    // Mensaje en el Logcat para debugging
+                                    Log.i("INFO COORDENADAS", text);
 
                                     // PARA EL PROXIMO ANALISIS
                                     coordenadaAnterior = coordenadaActual;
@@ -391,9 +415,8 @@ public class FaceDetectionAnalyzer extends AppCompatActivity implements ImageAna
                                     infoTextView.setText("");
                                 }
                             }
-
+                        });
                     })
-
                     .addOnFailureListener(faces -> {
                         runOnUiThread(() -> {
                             Log.i("INFO COORDENADAS", "NO SE HA PODIDO DETECTAR COORDENADAS EN UNA CARA O HA HABIDO UN ERROR");
@@ -406,19 +429,9 @@ public class FaceDetectionAnalyzer extends AppCompatActivity implements ImageAna
                             }
                         });
                     })
-
                     .addOnCompleteListener(task -> image.close());
         }
     }
-
-    private Bitmap convertImageProxyToBitmap(ImageProxy image) {
-        ImageProxy.PlaneProxy[] planes = image.getPlanes();
-        ByteBuffer buffer = planes[0].getBuffer();
-        byte[] bytes = new byte[buffer.capacity()];
-        buffer.get(bytes);
-        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length, null);
-    }
-
 
     @Override
     protected void onDestroy() {
