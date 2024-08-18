@@ -21,6 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.AspectRatio;
+import androidx.camera.core.Camera;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ExperimentalGetImage;
 import androidx.camera.core.ImageAnalysis;
@@ -135,24 +136,25 @@ public class FaceDetectionAnalyzer extends AppCompatActivity implements ImageAna
 
                 // Configuración de la vista previa
                 if (!(viewFinder==null)) {
-                    preview = new Preview.Builder()
-                            .setTargetAspectRatio(AspectRatio.RATIO_4_3)
-                            .build();
+                    viewFinder.setScaleType(PreviewView.ScaleType.FIT_END);
+
+                    preview = new Preview.Builder().build();
                     preview.setSurfaceProvider(viewFinder.getSurfaceProvider());
                 }
-
-                // Configuración del análisis de imagen
-                ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
-                        .setTargetAspectRatio(AspectRatio.RATIO_4_3)
-                        .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                        .build();
-
-                imageAnalysis.setAnalyzer(executor, this);
 
                 // Selector de camara frontal
                 CameraSelector cameraSelector = new CameraSelector.Builder()
                         .requireLensFacing(CameraSelector.LENS_FACING_FRONT)
                         .build();
+
+
+                // Configuración del análisis de imagen
+                ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
+                        .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                        .build();
+
+                imageAnalysis.setAnalyzer(executor, this);
+
 
                 // Desvincula y vuelve a vincular los casos de uso
                 cameraProvider.unbindAll();
