@@ -15,3 +15,5 @@
 local.properties
 *.apk
 *.dm
+*.apk
+.idea
