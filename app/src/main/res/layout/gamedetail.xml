@@ -199,18 +199,45 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/relatedPCTitle" />
 
+            <TextView
+                android:id="@+id/instructionsTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="40dp"
+                android:text="Instrucciones"
+                android:textAlignment="textStart"
+                android:textColor="@color/blue_UIB_5"
+                android:textSize="16dp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.003"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/relatedPCTitle" />
+
+            <TextView
+                android:id="@+id/instructionsValue"
+                android:layout_width="350dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:text="Realiza movimientos verticales y horizontales con la cabeza para mover a la serpiente sobre el césped. Intenta comer todas las manzanas posibles e intenta no chocar con las paredes o contigo mismo. Evita movimientos bruscos para no hacerte daño o marearte."
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/instructionsTitle" />
+
             <Button
                 android:id="@+id/buttonPlay"
                 android:layout_width="141dp"
                 android:layout_height="51dp"
                 android:layout_marginTop="20dp"
-                android:layout_marginBottom="12dp"
                 android:backgroundTint="@color/blue_UIB_3"
                 android:onClick="onPlayToExergame"
                 android:text="JUGAR"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/relatedPCValue" />
+                app:layout_constraintTop_toBottomOf="@+id/instructionsValue" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

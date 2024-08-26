@@ -7,7 +7,7 @@ public class Game implements Serializable  {
 
     // Version de serializacion para evitar errores
     private static final long serialVersionUID = 1L;
-    public String name, description;                            // Nombre y descripcion del juego
+    public String name, description, instructions;              // Nombre y descripcion del juego
     public int difficulty, id;                                  // Dificultad del juego
     public ArrayList<CervicalCondition> cervicalConditions;     // Condiciones cervicales asociadas
 
@@ -54,6 +54,13 @@ public class Game implements Serializable  {
     }
     public void setCervicalConditions(ArrayList<CervicalCondition> cervicalConditions) {
         this.cervicalConditions = cervicalConditions;
+    }
+
+    public String getInstructions() {
+        return instructions;
+    }
+    public void setInstructions(String instructions) {
+        this.instructions = instructions;
     }
 
     public int getId() {

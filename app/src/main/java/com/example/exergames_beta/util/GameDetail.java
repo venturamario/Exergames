@@ -21,7 +21,7 @@ import java.util.ArrayList;
 public class GameDetail extends AppCompatActivity {
 
     // VARS AND CONSTANTS
-    TextView exName, exDescription, exDifficulty, exProbCerv;
+    TextView exName, exDescription, exDifficulty, exProbCerv, exInstructions;
     ImageView gameImage;
     SuperObject superObject;
     User user;
@@ -34,6 +34,7 @@ public class GameDetail extends AppCompatActivity {
         // Obtener TextViews del layout
         exName = findViewById(R.id.valueName);
         exDescription = findViewById(R.id.descriptionValue);
+        exInstructions = findViewById(R.id.instructionsValue);
         exDifficulty = findViewById(R.id.difficultyValue);
         exProbCerv = findViewById(R.id.relatedPCValue);
         gameImage = findViewById(R.id.imageView4);
@@ -51,6 +52,7 @@ public class GameDetail extends AppCompatActivity {
 
             exName.setText(exergame.getName());
             exDescription.setText(exergame.getDescription());
+            exInstructions.setText(exergame.getInstructions());
             String text = exergame.getDifficulty() + " Estrellas";
             exDifficulty.setText(text);
             String cervConditions = exergame.getCervicalConditionsString();

@@ -1,5 +1,8 @@
 package com.example.exergames_beta;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -7,6 +10,9 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.exergames_beta.login.Login;
+import com.example.exergames_beta.notifications.DailyNotificationReceiver;
+
+import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -22,4 +28,5 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
+
 }

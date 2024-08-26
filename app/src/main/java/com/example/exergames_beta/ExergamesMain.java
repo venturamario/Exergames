@@ -1,5 +1,8 @@
 package com.example.exergames_beta;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -22,6 +25,7 @@ import androidx.viewbinding.ViewBinding;
 import com.example.exergames_beta.connection.DatabaseConnection;
 import com.example.exergames_beta.games.Snake.SnakeMain;
 import com.example.exergames_beta.login.Login;
+import com.example.exergames_beta.notifications.DailyNotificationReceiver;
 import com.example.exergames_beta.realTime.FaceDetectionAnalyzer;
 import com.example.exergames_beta.util.CervicalCondition;
 import com.example.exergames_beta.util.Game;
@@ -37,6 +41,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class ExergamesMain extends AppCompatActivity {
@@ -59,6 +64,9 @@ public class ExergamesMain extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.exergamesmain);
+
+        // Programar la notificación diaria
+        scheduleDailyNotification(this);
 
         // Instanciar super objeto
         superobject = new SuperObject();
@@ -96,6 +104,32 @@ public class ExergamesMain extends AppCompatActivity {
             }
         }
     }
+    public void scheduleDailyNotification(Context context) {
+        Intent intent = new Intent(context, DailyNotificationReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+        // Configurar el horario para la notificación diaria a las 12:00am
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, 20);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+
+        // Si la hora ya ha pasado, se programa para el siguiente día
+        if (calendar.getTimeInMillis() < System.currentTimeMillis()) {
+            calendar.add(Calendar.DAY_OF_YEAR, 1);
+        }
+
+        // Programar la alarma para repetirse diariamente
+        alarmManager.setRepeating(
+                AlarmManager.RTC_WAKEUP,
+                calendar.getTimeInMillis(),
+                AlarmManager.INTERVAL_DAY,
+                pendingIntent
+        );
+    }
+
 
     // ON CLICK
     public void onTryTracker(View view) {
@@ -159,50 +193,52 @@ public class ExergamesMain extends AppCompatActivity {
     }
 
     public void getExergameInfoFromBD(String name) {
-//        Connection con;
-//        PreparedStatement pStatement;
-//        ResultSet rs;
-//        Game g = new Game();
+        Connection con;
+        PreparedStatement pStatement;
+        ResultSet rs;
+        Game g = new Game();
 
         // Obtener info del juego en base a su nombre
         try {
-//            int gameId = getGameIdByName(name);
-//            con = connection.conexionBD();
-//            String callFunction = "SELECT * FROM get_game_details(?);";
-//            pStatement = con.prepareStatement(callFunction);
-//
-//            pStatement.setInt(1, gameId);
-//            rs = pStatement.executeQuery();
-//
-//            if (rs.next()) {
-//
-//                int idGame = rs.getInt(1);
-//                String gameName = rs.getString(2);
-//                String gameDesc = rs.getString(3);
-//                float gameDifficulty = rs.getFloat(4);
-//                int idCerv = rs.getInt(5);
-//
-//                g = new Game();
-//                g.setId(idGame);
-//                g.setName(gameName);
-//                g.setDescription(gameDesc);
-//                g.setDifficulty((int) gameDifficulty);
-//                g.setCervicalConditions(getCervicalProblemsById(idCerv));
-//
-//            }
-//
-//            superobject.setGame(g);
-//            superobject.setUserAux(null);
-//            superobject.setUser(user);
-//
-//            // Cerrar conexiones
-//            rs.close();
-//            pStatement.close();
-//            con.close();
+            int gameId = getGameIdByName(name);
+            con = connection.conexionBD();
+            String callFunction = "SELECT * FROM get_game_details(?);";
+            pStatement = con.prepareStatement(callFunction);
+
+            pStatement.setInt(1, gameId);
+            rs = pStatement.executeQuery();
+
+            if (rs.next()) {
+
+                int idGame = rs.getInt(1);
+                String gameName = rs.getString(2);
+                String gameDesc = rs.getString(3);
+                String gameInstructions = rs.getString(4);
+                float gameDifficulty = rs.getFloat(5);
+                int idCerv = rs.getInt(6);
+
+                g = new Game();
+                g.setId(idGame);
+                g.setName(gameName);
+                g.setDescription(gameDesc);
+                g.setInstructions(gameInstructions);
+                g.setDifficulty((int) gameDifficulty);
+                g.setCervicalConditions(getCervicalProblemsById(idCerv));
+
+            }
+
+            superobject.setGame(g);
+            superobject.setUserAux(null);
+            superobject.setUser(user);
+
+            // Cerrar conexiones
+            rs.close();
+            pStatement.close();
+            con.close();
 
             Intent intent = new Intent(this, GameDetail.class);
-            Game g = new Game();
-            g.setName("Snake Game");
+            //Game g = new Game();
+            //g.setName("Snake Game");
             superobject.setGame(g);
             superobject.setUser(user);
             intent.putExtra("superobject", superobject);
