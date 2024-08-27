@@ -46,46 +46,42 @@ public class Login extends AppCompatActivity {
 
     // Evento asociado al boton de inicio de sesión
     public void onLogIn(View view) {
-         User u = new User("Mario","Ventura","mario.ventura","1234",999,999);
-         gotoExergames(u);
+        username = editText_Username.getText().toString();
+        password = editText_Password.getText().toString();
 
+        try {
+            Connection con = connection.conexionBD();
+            String callFunction = "SELECT * FROM login(?,?);";
+            PreparedStatement pStatement = con.prepareStatement(callFunction);
 
-//        username = editText_Username.getText().toString();
-//        password = editText_Password.getText().toString();
-//
-//        try {
-//            Connection con = connection.conexionBD();
-//            String callFunction = "SELECT * FROM login(?,?);";
-//            PreparedStatement pStatement = con.prepareStatement(callFunction);
-//
-//            pStatement.setString(1, username);
-//            pStatement.setString(2, password);
-//
-//            ResultSet rs = pStatement.executeQuery();
-//
-//            if (rs.next()) {
-//                String uname = rs.getString("username");
-//                String name = rs.getString("name");
-//                String surname = rs.getString("lastname");
-//                String psswd = rs.getString("password");
-//                int level = rs.getInt("level");
-//                float xp = rs.getFloat("xp");
-//
-//                if (psswd.equals(password)) {
-//                    User user = new User(name, surname, uname, psswd, level, xp);
-//                    user.toString();
-//                    gotoExergames(user);
-//                } else {
-//                    Toast.makeText(this, "Usuario o contraseña incorrectos", Toast.LENGTH_LONG).show();
-//                }
-//            } else {
-//                Toast.makeText(this, "El nombre de usuario o contraseña no existen", Toast.LENGTH_LONG).show();
-//            }
-//        } catch (Exception e) {
-//            Log.e("LOG IN EXCEPTION",e.toString());
-//            e.printStackTrace();
-//            e.getMessage();
-//        }
+            pStatement.setString(1, username);
+            pStatement.setString(2, password);
+
+            ResultSet rs = pStatement.executeQuery();
+
+            if (rs.next()) {
+                String uname = rs.getString("username");
+                String name = rs.getString("name");
+                String surname = rs.getString("lastname");
+                String psswd = rs.getString("password");
+                int level = rs.getInt("level");
+                float xp = rs.getFloat("xp");
+
+                if (psswd.equals(password)) {
+                    User user = new User(name, surname, uname, psswd, level, xp);
+                    user.toString();
+                    gotoExergames(user);
+                } else {
+                    Toast.makeText(this, "Usuario o contraseña incorrectos", Toast.LENGTH_LONG).show();
+                }
+            } else {
+                Toast.makeText(this, "El nombre de usuario o contraseña no existen", Toast.LENGTH_LONG).show();
+            }
+        } catch (Exception e) {
+            Log.e("LOG IN EXCEPTION",e.toString());
+            e.printStackTrace();
+            e.getMessage();
+        }
 
     }
 
