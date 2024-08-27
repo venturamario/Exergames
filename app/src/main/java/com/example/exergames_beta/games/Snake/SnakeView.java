@@ -226,33 +226,33 @@ public class SnakeView extends View {
         int points = numApplesEaten * pointsPerApple;
 
         if (points>0) {
-            connection = new DatabaseConnection();
-
-            // Insertar puntos en bd
-            try {
-                Game g = this.game;
-                User u = this.user;
-
-                // Obtén la hora actual usando Calendar
-                Calendar calendar = Calendar.getInstance();
-                Timestamp timestamp = new Timestamp(calendar.getTimeInMillis());
-
-                Connection con = connection.conexionBD();
-                String callFunction = "SELECT insert_puntos(?,?,?,?);";
-                PreparedStatement pStatement = con.prepareStatement(callFunction);
-
-                pStatement.setString(1, u.getUsername());
-                pStatement.setInt(2, g.getId());
-                pStatement.setInt(3, points);
-                pStatement.setTimestamp(4, timestamp);
-
-                pStatement.execute();
-
-            } catch (Exception e) {
-                Log.e("SnaekGame exception at <saveProgress>",e.toString());
-                e.printStackTrace();
-                e.getMessage();
-            }
+//            connection = new DatabaseConnection();
+//
+//            // Insertar puntos en bd
+//            try {
+//                Game g = this.game;
+//                User u = this.user;
+//
+//                // Obtén la hora actual usando Calendar
+//                Calendar calendar = Calendar.getInstance();
+//                Timestamp timestamp = new Timestamp(calendar.getTimeInMillis());
+//
+//                Connection con = connection.conexionBD();
+//                String callFunction = "SELECT insert_puntos(?,?,?,?);";
+//                PreparedStatement pStatement = con.prepareStatement(callFunction);
+//
+//                pStatement.setString(1, u.getUsername());
+//                pStatement.setInt(2, g.getId());
+//                pStatement.setInt(3, points);
+//                pStatement.setTimestamp(4, timestamp);
+//
+//                pStatement.execute();
+//
+//            } catch (Exception e) {
+//                Log.e("SnaekGame exception at <saveProgress>",e.toString());
+//                e.printStackTrace();
+//                e.getMessage();
+//            }
         }
     }
 
