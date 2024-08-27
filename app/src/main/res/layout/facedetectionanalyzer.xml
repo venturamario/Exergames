@@ -21,7 +21,9 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintDimensionRatio="3:4" />
+            app:layout_constraintDimensionRatio="3:4"
+            app:scaleType="fitCenter"/>
+
 
         <com.example.exergames_beta.realTime.GraphicOverlay
             android:id="@+id/graphicOverlay"

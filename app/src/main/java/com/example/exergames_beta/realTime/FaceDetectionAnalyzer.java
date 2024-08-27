@@ -37,6 +37,7 @@ import com.example.exergames_beta.R;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.face.Face;
+import com.google.mlkit.vision.face.FaceContour;
 import com.google.mlkit.vision.face.FaceDetection;
 import com.google.mlkit.vision.face.FaceDetector;
 import com.google.mlkit.vision.face.FaceDetectorOptions;
@@ -103,8 +104,10 @@ public class FaceDetectionAnalyzer extends AppCompatActivity implements ImageAna
     public FaceDetectionAnalyzer() {
         FaceDetectorOptions options = new FaceDetectorOptions.Builder()
                 .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
-                .setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_ALL)
+                .setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_NONE)
+                .setContourMode(FaceDetectorOptions.CONTOUR_MODE_ALL)
                 .build();
+
 
         faceDetector = FaceDetection.getClient(options);
         coordenadaActual = new Coordenada();
@@ -136,8 +139,6 @@ public class FaceDetectionAnalyzer extends AppCompatActivity implements ImageAna
 
                 // Configuración de la vista previa
                 if (!(viewFinder==null)) {
-                    viewFinder.setScaleType(PreviewView.ScaleType.FIT_END);
-
                     preview = new Preview.Builder().build();
                     preview.setSurfaceProvider(viewFinder.getSurfaceProvider());
                 }
@@ -151,6 +152,7 @@ public class FaceDetectionAnalyzer extends AppCompatActivity implements ImageAna
                 // Configuración del análisis de imagen
                 ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
                         .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                        .setTargetAspectRatio(AspectRatio.RATIO_4_3)
                         .build();
 
                 imageAnalysis.setAnalyzer(executor, this);
@@ -189,16 +191,16 @@ public class FaceDetectionAnalyzer extends AppCompatActivity implements ImageAna
                             if (!faces.isEmpty()) {
                                 // Solo interesa la primera cara encontrada
                                 Face face = faces.get(0);
-                                FaceLandmark noseBase = face.getLandmark(FaceLandmark.NOSE_BASE);
+                                FaceContour noseBase = face.getContour(FaceContour.NOSE_BOTTOM);
                                 if (noseBase != null) {
                                     // OBTENER COORDENADAS
-                                    PointF noseBasePosition = noseBase.getPosition();
+                                    PointF noseBasePosition = noseBase.getPoints().get(1);
 
                                     // Ajustar coordenadas para mirroring horizontal
                                     float adjustedX;
                                     if (viewFinder != null) {
                                         // Invertir para solucionar mirroring en vista de "Proabr Tracker"
-                                        adjustedX = viewFinder.getWidth() - noseBasePosition.x;
+                                        adjustedX = inputImage.getHeight() - noseBasePosition.x;
                                     } else {
                                         // Uso de coordenada sin invertir para jugar a juegos
                                         adjustedX = noseBasePosition.x;
@@ -243,10 +245,11 @@ public class FaceDetectionAnalyzer extends AppCompatActivity implements ImageAna
                                                 coordenadaActual.getY(),        // Y nose
                                                 viewFinder.getWidth(),          // preview width
                                                 viewFinder.getHeight(),         // preview height
-                                                inputImage.getWidth(),          // analyzed image width
-                                                inputImage.getHeight(),         // analyzed image height
+                                                inputImage.getHeight(),         // analyzed image width
+                                                inputImage.getWidth(),          // analyzed image height
                                                 rotationDegrees                 // rotation degrees
                                         );
+
 
                                         // PRINT DEL MOVIMIENTO DETECTADO
                                         // Coordenadas
