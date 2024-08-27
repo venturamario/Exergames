@@ -1,24 +1,19 @@
 package com.example.exergames_beta.games.Snake;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.camera.core.CameraSelector;
-import androidx.camera.core.ImageAnalysis;
-import androidx.camera.core.Preview;
-import androidx.camera.lifecycle.ProcessCameraProvider;
-import androidx.camera.view.PreviewView;
-import androidx.core.content.ContextCompat;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.TextView;
 
 import com.example.exergames_beta.R;
+import com.example.exergames_beta.User;
 import com.example.exergames_beta.realTime.FaceDetectionAnalyzer;
 import com.example.exergames_beta.realTime.OnFaceMovementListener;
-import com.google.common.util.concurrent.ListenableFuture;
+import com.example.exergames_beta.util.Game;
+import com.example.exergames_beta.util.SuperObject;
 import com.google.mlkit.vision.face.FaceDetector;
 
-import java.util.concurrent.ExecutionException;
 
 public class SnakeMain extends AppCompatActivity implements OnAppleEatenListener, OnFaceMovementListener {
 
@@ -32,13 +27,25 @@ public class SnakeMain extends AppCompatActivity implements OnAppleEatenListener
     TextView pointsTV, movementTV;
     SnakeView snakeView;
     private FaceDetectionAnalyzer faceDetectionAnalyzer;
+    User u; Game g;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.snakemain);
 
+        Intent intent = getIntent();
+        SuperObject superObject = (SuperObject) intent.getSerializableExtra("superObject");
+
+        if (superObject != null) {
+            g = superObject.getGame();
+            u = superObject.getUser();
+        }
+
         snakeView = findViewById(R.id.snakeView);
+        snakeView.setUserID(u);
+        snakeView.setGameID(g);
+
         snakeView.setOnAppleEatenListener(this);
 
         faceDetectionAnalyzer = new FaceDetectionAnalyzer(this);

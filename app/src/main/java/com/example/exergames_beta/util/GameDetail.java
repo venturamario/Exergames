@@ -86,6 +86,7 @@ public class GameDetail extends AppCompatActivity {
         } else if (name.equals("Snake Game")) {
             Log.d("INFO EXERGAME","SE VA A JUGAR AL JUEGO DE SNAKE");
             Intent intent = new Intent(this, SnakeMain.class);
+            intent.putExtra("superObject", superObject);
             startActivity(intent);
         } else {
             Log.d("INFO EXERGAME","NO SE HA DETECTADO NINGÚN JUEGO PARA JUGAR");

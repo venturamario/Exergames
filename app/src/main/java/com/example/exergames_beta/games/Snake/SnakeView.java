@@ -9,15 +9,26 @@ import android.graphics.Paint;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import com.example.exergames_beta.R;
+import com.example.exergames_beta.User;
+import com.example.exergames_beta.connection.DatabaseConnection;
+import com.example.exergames_beta.util.Game;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.Calendar;
 import java.util.LinkedList;
 
 public class SnakeView extends View {
@@ -42,8 +53,14 @@ public class SnakeView extends View {
     // PROPIOS
     private OnAppleEatenListener onAppleEatenListener;  // Listener de comer manzana
     private int pointsPerApple = 100;                   // Puntos por comerse una manzana
+    private int numApplesEaten = 0;                     // Numero de manzanas comidas
     private Bitmap appleBitmap;                         // Imagen de la manzana
     private Bitmap grassBitmap;                         // Imagen de la hierba
+
+    // INFO PARA GUIARDAR PROGRESO DEL USUARIO
+    private User user;
+    private Game game;
+    DatabaseConnection connection;
 
     public enum Direccion {
         IZQUIERDA, DERECHA, SUBE, BAJA
@@ -104,6 +121,13 @@ public class SnakeView extends View {
 
     }
 
+    public void setUserID(User userID) {
+        this.user = userID;
+    }
+    public void setGameID(Game gameId) {
+        this.game = gameId;
+    }
+
     public void setOnAppleEatenListener(OnAppleEatenListener listener) {
         this.onAppleEatenListener = listener;
     }
@@ -140,6 +164,7 @@ public class SnakeView extends View {
     }
 
     public void iniciar() {
+        numApplesEaten = 0;
         lista = new LinkedList<Punto>();
         direccion = Direccion.DERECHA;
         crecimiento = 0;
@@ -161,6 +186,8 @@ public class SnakeView extends View {
     private void sePisa() {
         for (Punto p : lista) {
             if (p.x == columna && p.y == fila) {
+                // Puntos de la partida
+                this.saveProgress();
                 activo = false;
             }
         }
@@ -171,6 +198,7 @@ public class SnakeView extends View {
             generarCoordenadaFruta();
             crecimiento = 1;
             if (onAppleEatenListener != null) {
+                numApplesEaten++;
                 onAppleEatenListener.onAppleEaten(pointsPerApple);
             }
             return true;
@@ -188,7 +216,43 @@ public class SnakeView extends View {
     // controlamos si estamos fuera de la region del tablero
     private void verificarFueraTablero() {
         if (columna <= 0 || columna >= cuadrosAncho || fila <= 0 || fila >= cuadrosAlto) {
+            this.saveProgress();
             activo = false;
+        }
+    }
+
+    public void saveProgress() {
+        // Obtener puntos del usuario
+        int points = numApplesEaten * pointsPerApple;
+
+        if (points>0) {
+            connection = new DatabaseConnection();
+
+            // Insertar puntos en bd
+            try {
+                Game g = this.game;
+                User u = this.user;
+
+                // Obtén la hora actual usando Calendar
+                Calendar calendar = Calendar.getInstance();
+                Timestamp timestamp = new Timestamp(calendar.getTimeInMillis());
+
+                Connection con = connection.conexionBD();
+                String callFunction = "SELECT insert_puntos(?,?,?,?);";
+                PreparedStatement pStatement = con.prepareStatement(callFunction);
+
+                pStatement.setString(1, u.getUsername());
+                pStatement.setInt(2, g.getId());
+                pStatement.setInt(3, points);
+                pStatement.setTimestamp(4, timestamp);
+
+                pStatement.execute();
+
+            } catch (Exception e) {
+                Log.e("SnaekGame exception at <saveProgress>",e.toString());
+                e.printStackTrace();
+                e.getMessage();
+            }
         }
     }
 

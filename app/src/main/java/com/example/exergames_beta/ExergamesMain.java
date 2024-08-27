@@ -200,45 +200,46 @@ public class ExergamesMain extends AppCompatActivity {
 
         // Obtener info del juego en base a su nombre
         try {
-            int gameId = getGameIdByName(name);
-            con = connection.conexionBD();
-            String callFunction = "SELECT * FROM get_game_details(?);";
-            pStatement = con.prepareStatement(callFunction);
-
-            pStatement.setInt(1, gameId);
-            rs = pStatement.executeQuery();
-
-            if (rs.next()) {
-
-                int idGame = rs.getInt(1);
-                String gameName = rs.getString(2);
-                String gameDesc = rs.getString(3);
-                String gameInstructions = rs.getString(4);
-                float gameDifficulty = rs.getFloat(5);
-                int idCerv = rs.getInt(6);
-
-                g = new Game();
-                g.setId(idGame);
-                g.setName(gameName);
-                g.setDescription(gameDesc);
-                g.setInstructions(gameInstructions);
-                g.setDifficulty((int) gameDifficulty);
-                g.setCervicalConditions(getCervicalProblemsById(idCerv));
-
-            }
-
-            superobject.setGame(g);
-            superobject.setUserAux(null);
-            superobject.setUser(user);
-
-            // Cerrar conexiones
-            rs.close();
-            pStatement.close();
-            con.close();
+//            int gameId = getGameIdByName(name);
+//            con = connection.conexionBD();
+//            String callFunction = "SELECT * FROM get_game_details(?);";
+//            pStatement = con.prepareStatement(callFunction);
+//
+//            pStatement.setInt(1, gameId);
+//            rs = pStatement.executeQuery();
+//
+//
+//            if (rs.next()) {
+//
+//                int idGame = rs.getInt(1);
+//                String gameName = rs.getString(2);
+//                String gameDesc = rs.getString(3);
+//                String gameInstructions = rs.getString(4);
+//                float gameDifficulty = rs.getFloat(5);
+//                int idCerv = rs.getInt(6);
+//
+//                g = new Game();
+//                g.setId(idGame);
+//                g.setName(gameName);
+//                g.setDescription(gameDesc);
+//                g.setInstructions(gameInstructions);
+//                g.setDifficulty((int) gameDifficulty);
+//                g.setCervicalConditions(getCervicalProblemsById(idCerv));
+//
+//            }
+//
+//            superobject.setGame(g);
+//            superobject.setUserAux(null);
+//            superobject.setUser(user);
+//
+//            // Cerrar conexiones
+//            rs.close();
+//            pStatement.close();
+//            con.close();
 
             Intent intent = new Intent(this, GameDetail.class);
             //Game g = new Game();
-            //g.setName("Snake Game");
+            g.setName("Snake Game");
             superobject.setGame(g);
             superobject.setUser(user);
             intent.putExtra("superobject", superobject);
